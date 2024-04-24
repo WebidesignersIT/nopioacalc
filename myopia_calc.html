@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Myopia Calculation</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .form-container {
+        max-width: 400px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .input-group {
+        margin-bottom: 15px;
+    }
+    .input-group label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    .input-group input[type="number"],
+    .input-group select,
+    .input-group input[type="checkbox"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    button {
+        display: block;
+        width: 100%;
+        background-color: #4caf50;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    .result {
+        margin-top: 20px;
+    }
+    .myopia-list {
+        list-style-type: none;
+        padding: 0;
+    }
+    .myopia-list li {
+        margin-bottom: 5px;
+    }
+</style>
+</head>
+<body>
+<h1>Myopia Calculation</h1>
+
+<div class="form-container">
+    <div class="input-group">
+        <label for="age">Child's Age (years): </label>
+        <input type="number" id="age" min="1" max="20" required>
+    </div>
+    <div class="input-group">
+        <label for="previousMyopia">Previous Myopia Level (diopters): </label>
+        <input type="number" id="previousMyopia" step="0.01" required>
+    </div>
+    <div class="input-group">
+        <label for="parentalMyopia">Parental Myopia Present: </label>
+        <input type="checkbox" id="parentalMyopia">
+    </div>
+    <div class="input-group">
+        <label for="activity">Activity: </label>
+        <select id="activity" required>
+            <option value="none">None</option>
+            <option value="nearWork">Near Work</option>
+            <option value="outdoor">Outdoor</option>
+        </select>
+    </div>
+    <div class="input-group">
+        <label for="acUse">AC Use: </label>
+        <input type="checkbox" id="acUse">
+    </div>
+
+    <button onclick="calculateMyopia()">Calculate Myopia</button>
+
+    <div class="result">
+        <h2>Calculation Results:</h2>
+        <ul class="myopia-list" id="myopiaResults"></ul>
+    </div>
+</div>
+
+<script>
+    function calculateMyopia() {
+        var age = parseInt(document.getElementById("age").value);
+        var previousMyopia = parseFloat(document.getElementById("previousMyopia").value);
+        var activity = document.getElementById("activity").value;
+        var parentalMyopia = document.getElementById("parentalMyopia").checked;
+        var acUse = document.getElementById("acUse").checked;
+
+        // Myopia calculation formula
+        var ageIncreaseRates = [
+            [4, 10, 0.75],
+            [10, 15, 0.75],
+            [15, 18, 0.50]
+        ];
+        var activityCorrection = 1.0;
+        var parentalMyopiaCorrection = 1.0;
+        var acCorrection = 1.25;
+
+        var myopiaResults = document.getElementById("myopiaResults");
+        myopiaResults.innerHTML = ''; // Clear previous results
+
+        for (var i = 0; i <= 20; i++) {
+            var myopiaIncrease = 0;
+            for (var j = 0; j < ageIncreaseRates.length; j++) {
+                if (age >= ageIncreaseRates[j][0] && age < ageIncreaseRates[j][1]) {
+                    myopiaIncrease += ageIncreaseRates[j][2];
+                    break;
+                }
+            }
+
+            if (activity === "nearWork" || activity === "outdoor") {
+                myopiaIncrease -= activityCorrection;
+            }
+
+            if (parentalMyopia) {
+                myopiaIncrease -= parentalMyopiaCorrection;
+            }
+
+            if (acUse) {
+                myopiaIncrease += acCorrection;
+            }
+
+            var newMyopia = previousMyopia + myopiaIncrease;
+            var listItem = document.createElement("li");
+            listItem.textContent = "Age " + age + ": " + newMyopia.toFixed(2) + " Diopters";
+            myopiaResults.appendChild(listItem);
+
+            // Increment age for the next iteration
+            age++;
+        }
+    }
+</script>
+
+</body>
+</html>
